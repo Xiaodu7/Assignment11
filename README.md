@@ -1,264 +1,123 @@
-# 📦 Project Setup
+# IS601 Module 11 - Calculation Model and Testing
 
----
+This repository contains my Module 11 assignment for IS601. I extended the provided calculator project with a SQLAlchemy calculation model, Pydantic validation, additional tests, and a CI/CD pipeline.
 
-# 🧩 1. Install Homebrew (Mac Only)
+## Features
 
-> Skip this step if you're on Windows.
+- Supports addition, subtraction, multiplication, and division.
+- Uses a SQLAlchemy `Calculation` model with `id`, `a`, `b`, `type`, `inputs`, `result`, and a `user_id` foreign key.
+- Uses a factory method to create the correct calculation subclass.
+- Uses Pydantic `CalculationCreate` and `CalculationRead` schemas to validate input and output.
+- Rejects invalid calculation types, missing operands, and division by zero.
+- Includes unit, integration, PostgreSQL database, and end-to-end tests.
+- Uses GitHub Actions for testing, Trivy security scanning, and Docker Hub deployment.
 
-Homebrew is a package manager for macOS.  
-You’ll use it to easily install Git, Python, Docker, etc.
+**Note:** The project keeps the calculator webpage and existing routes from the starter project. The Module 11 work focuses on the calculation model and validation; it does not add new database-backed calculation routes.
 
-**Install Homebrew:**
+## Technologies
 
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
+Python 3.10, FastAPI, SQLAlchemy, Pydantic, PostgreSQL 17, pytest, Playwright, Docker, GitHub Actions, and Trivy.
 
-**Verify Homebrew:**
+## Setup (Ubuntu / WSL)
 
-```bash
-brew --version
-```
-
-If you see a version number, you're good to go.
-
----
-
-# 🧩 2. Install and Configure Git
-
-## Install Git
-
-- **MacOS (using Homebrew)**
+Clone the repository:
 
 ```bash
-brew install git
+git clone https://github.com/Xiaodu7/Assignment11.git
+cd Assignment11
 ```
 
-- **Windows**
-
-Download and install [Git for Windows](https://git-scm.com/download/win).  
-Accept the default options during installation.
-
-**Verify Git:**
+Create a virtual environment and install dependencies:
 
 ```bash
-git --version
+python3.10 -m venv venv
+source venv/bin/activate
+python -m pip install -r requirements.txt
 ```
 
----
+## Running the Application
 
-## Configure Git Globals
-
-Set your name and email so Git tracks your commits properly:
-
-```bash
-git config --global user.name "Your Name"
-git config --global user.email "your_email@example.com"
-```
-
-Confirm the settings:
-
-```bash
-git config --list
-```
-
----
-
-## Generate SSH Keys and Connect to GitHub
-
-> Only do this once per machine.
-
-1. Generate a new SSH key:
-
-```bash
-ssh-keygen -t ed25519 -C "your_email@example.com"
-```
-
-(Press Enter at all prompts.)
-
-2. Start the SSH agent:
-
-```bash
-eval "$(ssh-agent -s)"
-```
-
-3. Add the SSH private key to the agent:
-
-```bash
-ssh-add ~/.ssh/id_ed25519
-```
-
-4. Copy your SSH public key:
-
-- **Mac/Linux:**
-
-```bash
-cat ~/.ssh/id_ed25519.pub | pbcopy
-```
-
-- **Windows (Git Bash):**
-
-```bash
-cat ~/.ssh/id_ed25519.pub | clip
-```
-
-5. Add the key to your GitHub account:
-   - Go to [GitHub SSH Settings](https://github.com/settings/keys)
-   - Click **New SSH Key**, paste the key, save.
-
-6. Test the connection:
-
-```bash
-ssh -T git@github.com
-```
-
-You should see a success message.
-
----
-
-# 🧩 3. Clone the Repository
-
-Now you can safely clone the course project:
-
-```bash
-git clone <repository-url>
-cd <repository-directory>
-```
-
----
-
-# 🛠️ 4. Install Python 3.10+
-
-## Install Python
-
-- **MacOS (Homebrew)**
-
-```bash
-brew install python
-```
-
-- **Windows**
-
-Download and install [Python for Windows](https://www.python.org/downloads/).  
-✅ Make sure you **check the box** `Add Python to PATH` during setup.
-
-**Verify Python:**
-
-```bash
-python3 --version
-```
-or
-```bash
-python --version
-```
-
----
-
-## Create and Activate a Virtual Environment
-
-(Optional but recommended)
-
-```bash
-python3 -m venv venv
-source venv/bin/activate   # Mac/Linux
-venv\Scripts\activate.bat  # Windows
-```
-
-### Install Required Packages
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-# 🐳 5. (Optional) Docker Setup
-
-> Skip if Docker isn't used in this module.
-
-## Install Docker
-
-- [Install Docker Desktop for Mac](https://www.docker.com/products/docker-desktop/)
-- [Install Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/)
-
-## Build Docker Image
-
-```bash
-docker build -t <image-name> .
-```
-
-## Run Docker Container
-
-```bash
-docker run -it --rm <image-name>
-```
-
----
-
-# 🚀 6. Running the Project
-
-- **Without Docker**:
+Start the existing calculator application locally:
 
 ```bash
 python main.py
 ```
 
-(or update this if the main script is different.)
+Open `http://localhost:8000` in a browser. Stop the server with `Ctrl+C`.
 
-- **With Docker**:
-
-```bash
-docker run -it --rm <image-name>
-```
-
----
-
-# 📝 7. Submission Instructions
-
-After finishing your work:
+Alternatively, build and run the Docker image:
 
 ```bash
-git add .
-git commit -m "Complete Module X"
-git push origin main
+docker build -t assignment11:local .
+docker run --rm -p 127.0.0.1:8001:8000 assignment11:local
 ```
 
-Then submit the GitHub repository link as instructed.
+Open `http://localhost:8001` in a browser.
 
----
+## Running Tests
 
-# 🔥 Useful Commands Cheat Sheet
+The PostgreSQL integration tests require a **dedicated test database**. The test fixture creates and drops tables, so do not point `TEST_DATABASE_URL` at a database containing important data.
 
-| Action                         | Command                                          |
-| ------------------------------- | ------------------------------------------------ |
-| Install Homebrew (Mac)          | `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"` |
-| Install Git                     | `brew install git` or Git for Windows installer |
-| Configure Git Global Username  | `git config --global user.name "Your Name"`      |
-| Configure Git Global Email     | `git config --global user.email "you@example.com"` |
-| Clone Repository                | `git clone <repo-url>`                          |
-| Create Virtual Environment     | `python3 -m venv venv`                           |
-| Activate Virtual Environment   | `source venv/bin/activate` / `venv\Scripts\activate.bat` |
-| Install Python Packages        | `pip install -r requirements.txt`               |
-| Build Docker Image              | `docker build -t <image-name> .`                |
-| Run Docker Container            | `docker run -it --rm <image-name>`               |
-| Push Code to GitHub             | `git add . && git commit -m "message" && git push` |
+Start PostgreSQL 17 in Docker (local testing only):
 
----
+```bash
+docker run -d --name assignment11-test-db \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -e POSTGRES_DB=assignment11_test \
+  -p 127.0.0.1:5433:5432 postgres:17
+```
 
-# 📋 Notes
+Run unit and integration tests:
 
-- Install **Homebrew** first on Mac.
-- Install and configure **Git** and **SSH** before cloning.
-- Use **Python 3.10+** and **virtual environments** for Python projects.
-- **Docker** is optional depending on the project.
+```bash
+TEST_DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5433/assignment11_test \
+  python -m pytest tests/unit/ tests/integration/ -v
+```
 
----
+Install the Playwright browser and run end-to-end tests:
 
-# 📎 Quick Links
+```bash
+python -m playwright install chromium
+python -m pytest tests/e2e/ -v
+```
 
-- [Homebrew](https://brew.sh/)
-- [Git Downloads](https://git-scm.com/downloads)
-- [Python Downloads](https://www.python.org/downloads/)
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [GitHub SSH Setup Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+End-to-end tests start the app on port `8000`, so keep that port available. The `pytest.ini` file produces terminal and HTML coverage reports (`htmlcov/`).
+
+**Verified local results:** 78 unit/integration tests passed, 3 E2E tests passed, and 93% coverage for the unit/integration run.
+
+## CI/CD and Docker Hub
+
+The GitHub Actions workflow runs three jobs in sequence:
+
+1. **Test:** Runs unit, integration, and E2E tests with PostgreSQL.
+2. **Security:** Builds the Docker image and scans for HIGH/CRITICAL findings with Trivy.
+3. **Deploy:** Pushes the image to Docker Hub if the earlier jobs pass on `main`.
+
+- [GitHub repository](https://github.com/Xiaodu7/Assignment11)
+- [GitHub Actions](https://github.com/Xiaodu7/Assignment11/actions)
+- [Docker Hub repository](https://hub.docker.com/r/xdu7/assignment11)
+
+Pull the published image:
+
+```bash
+docker pull xdu7/assignment11:latest
+```
+
+## Project Structure
+
+```text
+app/models/calculation.py                 SQLAlchemy model and calculation factory
+app/schemas/calculation.py                Pydantic schemas and validation
+tests/unit/                               Unit tests
+tests/integration/                        Schema, calculation, and PostgreSQL tests
+tests/e2e/                                Browser-based tests
+.github/workflows/test.yml                CI/CD workflow
+Dockerfile                                Application container
+requirements.txt                          Python dependencies
+main.py                                   Existing calculator application
+```
+
+## Acknowledgment
+
+This assignment builds on the instructor's [Module 11 starter repository](https://github.com/kaw393939/module11_is601). My changes include the `a` and `b` model fields, expanded validation and reading schemas, additional tests, dependency/security fixes, and CI/CD configuration for my own Docker Hub repository.
