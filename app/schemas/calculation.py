@@ -173,6 +173,48 @@ class CalculationCreate(CalculationBase):
     In a real application, the user_id would typically come from the
     authenticated user's session rather than the request body.
     """
+
+    a: Optional[float] = None
+    b: Optional[float] = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def accept_two_operands(cls, values):
+        if not isinstance(values, dict):
+            return values
+
+        values = values.copy()
+
+        aliases = {
+            "add": "addition",
+            "sub": "subtraction",
+            "multiply": "multiplication",
+            "divide": "division"
+        }
+
+        if isinstance(values.get("type"), str):
+            type_name = values["type"].lower()
+            values["type"] = aliases.get(type_name, type_name)
+
+        if "a" in values or "b" in values:
+            if "a" not in values or "b" not in values:
+                raise ValueError("Both a and b are required")
+
+            if "inputs" in values and values["inputs"] != [values["a"], values["b"]]:
+                raise ValueError("inputs must match a and b")
+
+            values["inputs"] = [values["a"], values["b"]]
+
+        return values
+
+    @model_validator(mode="after")
+    def populate_a_b(self):
+        if self.a is None:
+            self.a = self.inputs[0]
+        if self.b is None:
+            self.b = self.inputs[1]
+        return self
+
     user_id: UUID = Field(
         ...,
         description="UUID of the user who owns this calculation",
@@ -279,3 +321,15 @@ class CalculationResponse(CalculationBase):
             }
         }
     )
+
+
+class CalculationRead(BaseModel):
+    """Schema for reading a calculation."""
+
+    id: UUID
+    a: float
+    b: float
+    type: CalculationType
+    result: Optional[float] = None
+
+    model_config = ConfigDict(from_attributes=True)

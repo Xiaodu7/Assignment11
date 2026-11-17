@@ -89,6 +89,16 @@ class AbstractCalculation:
         )
 
     @declared_attr
+    def a(cls):
+        """First operand."""
+        return Column(Float, nullable=True)
+
+    @declared_attr
+    def b(cls):
+        """Second operand."""
+        return Column(Float, nullable=True)
+
+    @declared_attr
     def inputs(cls):
         """
         JSON column storing the list of numbers for the calculation.
@@ -186,7 +196,15 @@ class AbstractCalculation:
             raise ValueError(
                 f"Unsupported calculation type: {calculation_type}"
             )
-        return calculation_class(user_id=user_id, inputs=inputs)
+        if not isinstance(inputs, list) or len(inputs) < 2:
+            raise ValueError("At least two numbers are required")
+
+        return calculation_class(
+            user_id=user_id,
+            inputs=inputs,
+            a=inputs[0],
+            b=inputs[1]
+        )
 
     def get_result(self) -> float:
         """
